@@ -24,4 +24,5 @@ MyBishop >> targetSquaresLegal: aBoolean [
 	  , (self upLeftDiagonalLegal: aBoolean)
 	  , (self downRightDiagonalLegal: aBoolean)
 	  , (self downLeftDiagonalLegal: aBoolean)
+		, (self downLeftDiagonalLegal: aBoolean)
 ]
