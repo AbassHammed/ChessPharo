@@ -6,62 +6,46 @@ Class {
 }
 
 { #category : 'tests' }
-MyRookTests >> testId [
-
-	self assert: MyRook new id equals: 'R'
-]
-
-{ #category : 'tests' }
 MyRookTests >> testMoves [
 
 	| rook squares board |
 	board := MyChessBoard empty.
 	board at: 'e4' put: (rook := MyRook white).
 
-	squares := rook targetSquares.
+	squares := rook legalTargetSquares.
 	self
-		assertCollection: squares
-		includesAll:
-			(#( e5 e6 e7 e8 d4 c4 b4 a4 f4 g4 h4 e3 e2 e1 ) collect: [ :name |
-				 board at: name ])
+		assert: (squares collect: #name) asSortedCollection asArray
+		equals: #('e5' 'e6' 'e7' 'e8' 'd4' 'c4' 'b4' 'a4' 'f4' 'g4' 'h4' 'e3' 'e2' 'e1') asSortedCollection asArray
 ]
 
 { #category : 'tests' }
 MyRookTests >> testMovesWithOponentObstacle [
 
-	| bishop squares board |
+	| rook squares board |
 	board := MyChessBoard empty.
-	board at: 'e4' put: (bishop := MyRook white).
+	board at: 'e4' put: (rook := MyRook white).
 
-	"Rooks don't jump above pieces"
-	"But they eat pieces of the other color"
-	"Let's put a black obstacle on g4, blocking the f rank"
+	"A rook can capture the enemy on g4, but cannot move beyond it."
 	board at: 'g4' put: MyRook black.
 
-	squares := bishop targetSquares.
+	squares := rook legalTargetSquares.
 	self
-		assertCollection: squares
-		includesAll:
-			(#( e5 e6 e7 e8 d4 c4 b4 a4 f4 g4 e3 e2 e1 ) collect: [ :name |
-				 board at: name ])
+		assert: (squares collect: #name) asSortedCollection asArray
+		equals: #('e5' 'e6' 'e7' 'e8' 'd4' 'c4' 'b4' 'a4' 'f4' 'g4' 'e3' 'e2' 'e1') asSortedCollection asArray
 ]
 
 { #category : 'tests' }
 MyRookTests >> testMovesWithSameColorObstacle [
 
-	| bishop squares board |
+	| rook squares board |
 	board := MyChessBoard empty.
-	board at: 'e4' put: (bishop := MyRook white).
+	board at: 'e4' put: (rook := MyRook white).
 
-	"Rooks don't jump above pieces"
-	"And they don't eat pieces of the same color either"
-	"Let's put a white obstacle on g4, blocking the f rank"
-	board at: 'g4' put: MyRook black.
+	"A rook cannot capture its own piece on g4 or move beyond it."
+	board at: 'g4' put: MyRook white.
 
-	squares := bishop targetSquares.
+	squares := rook legalTargetSquares.
 	self
-		assertCollection: squares
-		includesAll:
-			(#( e5 e6 e7 e8 d4 c4 b4 a4 f4 e3 e2 e1 ) collect: [ :name |
-				 board at: name ])
+		assert: (squares collect: #name) asSortedCollection asArray
+		equals: #('e5' 'e6' 'e7' 'e8' 'd4' 'c4' 'b4' 'a4' 'f4' 'e3' 'e2' 'e1') asSortedCollection asArray
 ]

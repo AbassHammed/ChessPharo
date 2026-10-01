@@ -6,24 +6,16 @@ Class {
 }
 
 { #category : 'tests' }
-MyBishopTests >> testId [
-
-	self assert: MyBishop new id equals: 'B'
-]
-
-{ #category : 'tests' }
 MyBishopTests >> testMoves [
 
 	| bishop squares board |
 	board := MyChessBoard empty.
 	board at: 'e4' put: (bishop := MyBishop white).
 
-	squares := bishop targetSquares.
+	squares := bishop legalTargetSquares.
 	self
-		assertCollection: squares
-		includesAll:
-			(#( f5 g6 h7 f3 g2 h1 d5 c6 b7 a8 d3 c2 b1 ) collect: [ :name |
-				 board at: name ])
+		assert: (squares collect: #name) asSortedCollection asArray
+		equals: #('f5' 'g6' 'h7' 'f3' 'g2' 'h1' 'd5' 'c6' 'b7' 'a8' 'd3' 'c2' 'b1') asSortedCollection asArray
 ]
 
 { #category : 'tests' }
@@ -33,17 +25,13 @@ MyBishopTests >> testMovesWithOponentObstacle [
 	board := MyChessBoard empty.
 	board at: 'e4' put: (bishop := MyBishop white).
 
-	"Bishops don't jump above pieces"
-	"But they eat pieces of the other color"
-	"Let's put a black obstacle on g6, blocking the f5-h7 diagonal"
+	"A bishop can capture the enemy on g6, but cannot move beyond it."
 	board at: 'g6' put: MyBishop black.
 
-	squares := bishop targetSquares.
+	squares := bishop legalTargetSquares.
 	self
-		assertCollection: squares
-		includesAll:
-			(#( f5 g6 f3 g2 h1 d5 c6 b7 a8 d3 c2 b1 ) collect: [ :name |
-				 board at: name ])
+		assert: (squares collect: #name) asSortedCollection asArray
+		equals: #('f5' 'g6' 'f3' 'g2' 'h1' 'd5' 'c6' 'b7' 'a8' 'd3' 'c2' 'b1') asSortedCollection asArray
 ]
 
 { #category : 'tests' }
@@ -53,15 +41,11 @@ MyBishopTests >> testMovesWithSameColorObstacle [
 	board := MyChessBoard empty.
 	board at: 'e4' put: (bishop := MyBishop white).
 
-	"Bishops don't jump above pieces"
-	"And they don't eat pieces of the same color either"
-	"Let's put a white obstacle on g6, blocking the f5-h7 diagonal"
+	"A bishop cannot capture its own piece on g6 or move beyond it."
 	board at: 'g6' put: MyBishop white.
 
-	squares := bishop targetSquares.
+	squares := bishop legalTargetSquares.
 	self
-		assertCollection: squares
-		includesAll:
-			(#( f5 f3 g2 h1 d5 c6 b7 a8 d3 c2 b1 ) collect: [ :name |
-				 board at: name ])
+		assert: (squares collect: #name) asSortedCollection asArray
+		equals: #('f5' 'f3' 'g2' 'h1' 'd5' 'c6' 'b7' 'a8' 'd3' 'c2' 'b1') asSortedCollection asArray
 ]

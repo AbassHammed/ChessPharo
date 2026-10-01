@@ -21,8 +21,7 @@ MyBishop >> renderPieceOn: aSquare [
 MyBishop >> targetSquaresLegal: aBoolean [
 
 	^ (self upRightDiagonalLegal: aBoolean)
-	  , (self upLeftDiagonalLegal: aBoolean)
-	  , (self downRightDiagonalLegal: aBoolean)
-	  , (self downLeftDiagonalLegal: aBoolean)
+		, (self upLeftDiagonalLegal: aBoolean)
+		, (self downRightDiagonalLegal: aBoolean)
 		, (self downLeftDiagonalLegal: aBoolean)
 ]
