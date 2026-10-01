@@ -56,6 +56,22 @@ MyChessGame >> checkForMate [
 	blackPlayer king isCheckMated ifTrue: [ self halt: 'White wins!' ].
 ]
 
+{ #category : 'promotion' }
+MyChessGame >> choosePromotionPiece [
+
+	| choice boardWindow |
+	"The standard Pharo dialog belongs to the image window."
+	boardWindow := self space ifNotNil: [ :aSpace | aSpace hostSpace ].
+	boardWindow ifNotNil: #hide.
+	choice := [
+		UIManager default
+			chooseFrom: #('Queen' 'Rook' 'Bishop' 'Knight')
+			title: 'Promote pawn to which piece?'
+	] ensure: [ boardWindow ifNotNil: #show ].
+	^ { MyQueen. MyRook. MyBishop. MyKnight }
+		at: choice ifAbsent: [ nil ]
+]
+
 { #category : 'accessing' }
 MyChessGame >> currentPlayer [
 
@@ -163,6 +179,18 @@ MyChessGame >> moveCount [
 MyChessGame >> moveHistory [
 
 	^ moves copy
+]
+
+{ #category : 'public' }
+MyChessGame >> moveInteractively: piece to: square [
+
+	| choice |
+	piece color = currentPlayer color ifFalse: [ ^ false ].
+	(piece legalTargetSquares includes: square) ifFalse: [ ^ false ].
+	(piece needsPromotionAt: square) ifFalse: [ ^ self move: piece to: square ].
+	choice := self choosePromotionPiece.
+	choice ifNil: [ ^ false ].
+	^ self move: piece to: square promotingTo: choice
 ]
 
 { #category : 'accessing' }
