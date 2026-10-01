@@ -56,6 +56,12 @@ MyChessGame >> checkForMate [
 	blackPlayer king isCheckMated ifTrue: [ self halt: 'White wins!' ].
 ]
 
+{ #category : 'accessing' }
+MyChessGame >> currentPlayer [
+
+	^ currentPlayer
+]
+
 { #category : 'initialization' }
 MyChessGame >> initialize [
 
@@ -126,8 +132,25 @@ MyChessGame >> initializeFromFENGame: aFENGame [
 { #category : 'public' }
 MyChessGame >> move: piece to: square [
 
-	piece moveTo: square.
-	self recordMovementOf: piece to: square
+	piece color = currentPlayer color ifFalse: [ ^ false ].
+	(piece moveTo: square) ifFalse: [ ^ false ].
+	self recordMovementOf: piece to: square.
+	currentPlayer := piece isWhite
+		ifTrue: [ blackPlayer ]
+		ifFalse: [ moveCount := moveCount + 1. whitePlayer ].
+	^ true
+]
+
+{ #category : 'accessing' }
+MyChessGame >> moveCount [
+
+	^ moveCount
+]
+
+{ #category : 'accessing' }
+MyChessGame >> moveHistory [
+
+	^ moves copy
 ]
 
 { #category : 'accessing' }
@@ -140,11 +163,6 @@ MyChessGame >> pieces [
 MyChessGame >> play [
 
 	currentPlayer play.
-	currentPlayer = whitePlayer
-		ifTrue: [ currentPlayer := blackPlayer ]
-		ifFalse: [ 
-			moveCount := moveCount + 1.
-			currentPlayer := whitePlayer ].
 	self checkForMate
 ]
 
