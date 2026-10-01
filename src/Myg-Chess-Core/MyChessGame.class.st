@@ -132,9 +132,21 @@ MyChessGame >> initializeFromFENGame: aFENGame [
 { #category : 'public' }
 MyChessGame >> move: piece to: square [
 
+	^ self move: piece to: square promotingTo: MyQueen
+]
+
+{ #category : 'public' }
+MyChessGame >> move: piece to: square promotingTo: aPieceClass [
+
+	| promoting moved |
 	piece color = currentPlayer color ifFalse: [ ^ false ].
-	(piece moveTo: square) ifFalse: [ ^ false ].
-	self recordMovementOf: piece to: square.
+	promoting := piece needsPromotionAt: square.
+	moved := promoting
+		ifTrue: [ piece moveTo: square promotingTo: aPieceClass ]
+		ifFalse: [ piece moveTo: square ].
+	moved ifFalse: [ ^ false ].
+	self recordMovementOf: piece to: square
+		promotion: (promoting ifTrue: [ aPieceClass ] ifFalse: [ nil ]).
 	currentPlayer := piece isWhite
 		ifTrue: [ blackPlayer ]
 		ifFalse: [ moveCount := moveCount + 1. whitePlayer ].
@@ -168,13 +180,21 @@ MyChessGame >> play [
 
 { #category : 'moves' }
 MyChessGame >> recordMovementOf: aPiece to: aSquare [
+
+	self recordMovementOf: aPiece to: aSquare promotion: nil
+]
+
+{ #category : 'moves' }
+MyChessGame >> recordMovementOf: aPiece to: aSquare promotion: aPieceClass [
 	"moves add: (MyMove piece: aPiece square: aSquare name)."
 
-	| prefix movesText |
+	| prefix movesText moveText |
 	prefix := currentPlayer isWhite
 		          ifTrue: [ moveCount asString , '.' ]
 		          ifFalse: [ '' ].
-	moves add: prefix , ' ' , aPiece id , aSquare name.
+	moveText := prefix , ' ' , aPiece id , aSquare name.
+	aPieceClass ifNotNil: [ moveText := moveText , '=' , aPieceClass new id ].
+	moves add: moveText.
 	
 	movesText := String streamContents: [ :stream |
 		| currentLine |

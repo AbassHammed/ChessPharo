@@ -186,6 +186,12 @@ MyPiece >> moveTo: aSquare [
 	^ true
 ]
 
+{ #category : 'testing' }
+MyPiece >> needsPromotionAt: aSquare [
+
+	^ false
+]
+
 { #category : 'rendering' }
 MyPiece >> rightFile [
 

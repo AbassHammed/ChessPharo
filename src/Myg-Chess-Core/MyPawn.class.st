@@ -30,11 +30,51 @@ MyPawn >> id [
 ]
 
 { #category : 'testing' }
+MyPawn >> isOnPromotionRank [
+
+	^ square notNil and: [
+		self isWhite
+			ifTrue: [ square file = $8 ]
+			ifFalse: [ square file = $1 ] ]
+]
+
+{ #category : 'testing' }
 MyPawn >> isOnStartingRank [
 
 	^ self isWhite
 		ifTrue: [ square file = $2 ]
 		ifFalse: [ square file = $7 ]
+]
+
+{ #category : 'path commands' }
+MyPawn >> moveTo: aSquare promotingTo: aPieceClass [
+
+	({ MyQueen. MyRook. MyBishop. MyKnight } includes: aPieceClass)
+		ifFalse: [ ^ false ].
+	(aSquare file = (self isWhite ifTrue: [ $8 ] ifFalse: [ $1 ]))
+		ifFalse: [ ^ false ].
+	(super moveTo: aSquare) ifFalse: [ ^ false ].
+	^ self promoteTo: aPieceClass
+]
+
+{ #category : 'testing' }
+MyPawn >> needsPromotionAt: aSquare [
+
+	^ aSquare file = (self isWhite ifTrue: [ $8 ] ifFalse: [ $1 ])
+]
+
+{ #category : 'promotion' }
+MyPawn >> promoteTo: aPieceClass [
+
+	| replacement |
+	self isOnPromotionRank ifFalse: [ ^ false ].
+	square contents == self ifFalse: [ ^ false ].
+	({ MyQueen. MyRook. MyBishop. MyKnight } includes: aPieceClass)
+		ifFalse: [ ^ false ].
+	replacement := aPieceClass new color: color; yourself.
+	self board at: square name put: replacement.
+	square := nil.
+	^ true
 ]
 
 { #category : 'rendering' }
