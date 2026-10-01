@@ -30,11 +30,8 @@ MyUnselectedState >> board: anObject [
 
 { #category : 'events' }
 MyUnselectedState >> clickOn: aMyChessSquare [
-	"Nothing is selected.
-	Select the chess square"
-	aMyChessSquare select.
-	aMyChessSquare contents ifNotNil: [
-		board highLightTargets: aMyChessSquare contents targetSquares ].
 
+	aMyChessSquare select.
+	board highLightTargets: aMyChessSquare contents targetSquares.
 	^ MySelectedState board: board selected: aMyChessSquare
 ]

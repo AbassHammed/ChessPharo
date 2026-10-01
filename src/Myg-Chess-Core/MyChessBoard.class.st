@@ -201,7 +201,7 @@ MyChessBoard >> initializeSquares [
 						          color: Color black;
 						          board: self;
 						          initialize;
-						          contents: nil;
+						          emptyContents;
 						          yourself ]
 				          ifFalse: [
 					          black := true.
@@ -209,7 +209,7 @@ MyChessBoard >> initializeSquares [
 						          color: Color white;
 						          board: self;
 						          initialize;
-						          contents: nil;
+						          emptyContents;
 						          yourself ].
 			square name: squareNotation.
 			grid at: squareNotation put: square.
@@ -219,8 +219,8 @@ MyChessBoard >> initializeSquares [
 
 { #category : 'accessing' }
 MyChessBoard >> pieces [
-	
-	^ children collect: [ :square | square contents ]
+
+	^ (children collect: [ :square | square contents ]) select: #isPiece
 ]
 
 { #category : 'accessing' }
