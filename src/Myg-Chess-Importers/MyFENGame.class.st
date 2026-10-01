@@ -9,7 +9,8 @@ Class {
 		'halfMoveClock',
 		'moveCount',
 		'white',
-		'black'
+		'black',
+		'castlingAbility'
 	],
 	#category : 'Myg-Chess-Importers',
 	#package : 'Myg-Chess-Importers'
@@ -21,13 +22,15 @@ MyFENGame >> board [
 ]
 
 { #category : 'accessing' }
+MyFENGame >> castlingAbility [
+
+	^ castlingAbility copy
+]
+
+{ #category : 'accessing' }
 MyFENGame >> castlingAbility: aCollection [
 
-	aCollection do: [ :castling |
-		castling = 'K' ifTrue: [ white canCastleKingside ].
-		castling = 'Q' ifTrue: [ white canCastleQueenside ].
-		castling = 'k' ifTrue: [ black canCastleKingside ].
-		castling = 'q' ifTrue: [ black canCastleQueenside ] ]
+	castlingAbility := aCollection copy
 ]
 
 { #category : 'accessing' }

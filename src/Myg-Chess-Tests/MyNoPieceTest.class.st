@@ -8,22 +8,22 @@ Class {
 { #category : 'tests' }
 MyNoPieceTest >> testClearedSquareCanBeClickedBeforeMovingAPawn [
 
-	| game board pawn |
-	game := MyChessGame freshGame.
+	| game board |
+	game := MyChessGame fromFENString: '7k/8/8/8/8/8/4P3/K7 w - - 0 1'.
 	board := game pieces first board.
-	pawn := (board at: 'e2') contents.
 	board at: 'e3' put: MyBishop black.
 	(board at: 'e3') emptyContents.
 	self deny: (board at: 'e3') hasPiece.
-	self assert: board pieces size equals: 32.
+	self assert: board pieces size equals: 3.
 	(board at: 'e3') click.
 	(board at: 'e4') click.
-	self assert: (board at: 'e2') contents identicalTo: pawn.
+	self assert: game moveHistory isEmpty.
 	self deny: (board children anySatisfy: #isTargetHighlighted).
 	(board at: 'e2') click.
 	(board at: 'e4') click.
-	self assert: (board at: 'e4') contents identicalTo: pawn.
-	self deny: (board at: 'e2') hasPiece
+	self assert: (board at: 'e4') contents class equals: MyPawn.
+	self deny: (board at: 'e2') hasPiece.
+	self assert: game moveHistory equals: #('1. Pe4') asOrderedCollection
 ]
 
 { #category : 'tests' }
