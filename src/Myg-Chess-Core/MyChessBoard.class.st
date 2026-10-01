@@ -73,6 +73,21 @@ MyChessBoard >> click: aMyChessSquare [
 	state := state clickOn: aMyChessSquare
 ]
 
+{ #category : 'testing' }
+MyChessBoard >> copyAfterMoving: aPiece to: aSquare [
+	"Try a move on separate squares and pieces, leaving the real board unchanged."
+
+	| copiedBoard movingPiece |
+	copiedBoard := self class empty.
+	self pieces do: [ :each |
+		copiedBoard at: each square name put: each copy ].
+
+	movingPiece := (copiedBoard at: aPiece square name) contents.
+	movingPiece square emptyContents.
+	copiedBoard at: aSquare name put: movingPiece.
+	^ copiedBoard
+]
+
 { #category : 'accessing' }
 MyChessBoard >> game [
 
@@ -215,6 +230,14 @@ MyChessBoard >> initializeSquares [
 			grid at: squareNotation put: square.
 			self addChild: square ].
 		black := black not ]
+]
+
+{ #category : 'accessing' }
+MyChessBoard >> kingOfColor: aColor [
+
+	^ self pieces
+		detect: [ :each | each color = aColor and: [ each isKing ] ]
+		ifNone: [ nil ]
 ]
 
 { #category : 'accessing' }

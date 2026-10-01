@@ -23,16 +23,27 @@ MyMoveFeedbackTest >> setUp [
 	board := game pieces first board
 ]
 
+{ #category : 'tests - support' }
+MyMoveFeedbackTest >> setUpPinnedRook [
+
+	board pieces do: [ :each | each square emptyContents ].
+	board at: 'e1' put: MyKing white.
+	board at: 'e2' put: MyRook white.
+	board at: 'e8' put: MyRook black.
+	board at: 'a8' put: MyKing black
+]
+
 { #category : 'tests' }
 MyMoveFeedbackTest >> testAcceptedClickClearsHighlightsAndRecordsOnce [
 
-	| pawn |
-	pawn := (board at: 'e2') contents.
+	| rook |
+	self setUpPinnedRook.
+	rook := (board at: 'e2') contents.
 	(board at: 'e2') click.
-	(board at: 'e4') click.
+	(board at: 'e3') click.
 	self assert: self highlightedSquareNames isEmpty.
-	self assert: game moveHistory equals: #('1. Pe4') asOrderedCollection.
-	self assert: (board at: 'e4') contents identicalTo: pawn.
+	self assert: game moveHistory equals: #('1. Re3') asOrderedCollection.
+	self assert: (board at: 'e3') contents identicalTo: rook.
 	self deny: (board at: 'e2') hasPiece.
 	self deny: game currentPlayer isWhite.
 	self assert: game moveCount equals: 1
@@ -90,16 +101,31 @@ MyMoveFeedbackTest >> testBotButtonPassesTurnOnlyOnce [
 ]
 
 { #category : 'tests' }
+MyMoveFeedbackTest >> testKingCaptureIsRecordedOnce [
+
+	| king |
+	board pieces do: [ :each | each square emptyContents ].
+	board at: 'e1' put: (king := MyKing white).
+	board at: 'd2' put: MyRook black.
+	board at: 'h8' put: MyKing black.
+	game move: king to: (board at: 'd2').
+	self assert: game moveHistory equals: #('1. Kd2') asOrderedCollection.
+	self assert: (board at: 'd2') contents identicalTo: king.
+	self deny: (board at: 'e1') hasPiece
+]
+
+{ #category : 'tests' }
 MyMoveFeedbackTest >> testRejectedClickClearsHighlightsWithoutRecordingMove [
 
-	| pawn |
-	pawn := (board at: 'e2') contents.
+	| rook |
+	self setUpPinnedRook.
+	rook := (board at: 'e2') contents.
 	(board at: 'e2') click.
-	(board at: 'e5') click.
+	(board at: 'd2') click.
 	self assert: self highlightedSquareNames isEmpty.
 	self assert: game moveHistory isEmpty.
-	self assert: (board at: 'e2') contents identicalTo: pawn.
-	self deny: (board at: 'e5') hasPiece.
+	self assert: (board at: 'e2') contents identicalTo: rook.
+	self deny: (board at: 'd2') hasPiece.
 	self assert: game currentPlayer isWhite.
 	self assert: game moveCount equals: 1
 ]
@@ -126,9 +152,11 @@ MyMoveFeedbackTest >> testRejectedMovePreservesExistingHistory [
 ]
 
 { #category : 'tests' }
-MyMoveFeedbackTest >> testSelectingPawnHighlightsOnlyLegalMoves [
+MyMoveFeedbackTest >> testSelectingPinnedRookHighlightsOnlyLegalMoves [
 
+	self setUpPinnedRook.
 	(board at: 'e2') click.
-	self assert: self highlightedSquareNames asSortedCollection asArray
-		equals: #('e3' 'e4')
+	self
+		assert: self highlightedSquareNames asSortedCollection asArray
+		equals: #('e3' 'e4' 'e5' 'e6' 'e7' 'e8') asSortedCollection asArray
 ]

@@ -8,7 +8,7 @@ Class {
 { #category : 'as yet unclassified' }
 MyKing >> attackingSquares [
 
-	^ self basicTargetSquares
+	^ self basicTargetSquares select: [ :each | each notNil ]
 ]
 
 { #category : 'rendering' }
@@ -35,14 +35,13 @@ MyKing >> id [
 
 { #category : 'testing' }
 MyKing >> isCheckMated [
-	"We check if the opponent pieces target all my potential movements and myself"
 
-	| threatenedSquares |
-	threatenedSquares := self opponentPieces flatCollect: [ :e |
-		                     e attackingSquares ].
+	| friendlyPieces |
+	self isInCheck ifFalse: [ ^ false ].
+	friendlyPieces := self board pieces select: [ :each |
+		each color = color ].
 
-	^ self legalTargetSquares isEmpty and: [
-		  threatenedSquares includes: self square ]
+	^ (friendlyPieces anySatisfy: [ :each | each legalTargetSquares notEmpty ]) not
 ]
 
 { #category : 'testing' }
@@ -77,18 +76,9 @@ MyKing >> renderPieceOn: aSquare [
 
 { #category : 'rendering' }
 MyKing >> targetSquaresLegal: aBoolean [
-	"The king cannot move to threatened squares"
+	"King safety is checked by the inherited legalTargetSquares method."
 
-	| threatenedSquares |
-	threatenedSquares := self opponentPieces flatCollect: [ :e |
-		                     e attackingSquares ].
-
-	^ self basicTargetSquares select: [ :s |
-		  s notNil and: [
-			  (threatenedSquares includes: s) not and: [
-				  s hasPiece not or: [ 
-					"The square has an opponent piece"
-					s contents color ~= color and: [ 
-						"Let's hope the piece is not defended"
-						threatenedSquares includes: s  ] ] ] ] ]
+	^ self basicTargetSquares select: [ :target |
+		target notNil and: [
+			target hasPiece not or: [ target contents color ~= color ] ] ]
 ]

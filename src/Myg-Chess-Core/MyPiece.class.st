@@ -27,8 +27,9 @@ MyPiece class >> white [
 
 { #category : 'as yet unclassified' }
 MyPiece >> attackingSquares [
+	"Attacks use movement rules without recursively checking king safety."
 
-	^ self legalTargetSquares
+	^ self targetSquaresLegal: true
 ]
 
 { #category : 'path commands' }
@@ -143,6 +144,18 @@ MyPiece >> isWhite [
 	^ color isBlack not
 ]
 
+{ #category : 'testing' }
+MyPiece >> leavesKingInCheckAt: aSquare [
+
+	| simulatedBoard king |
+	"The existing movement tests also use boards without kings."
+	(self board kingOfColor: color) ifNil: [ ^ false ].
+
+	simulatedBoard := self board copyAfterMoving: self to: aSquare.
+	king := simulatedBoard kingOfColor: color.
+	^ king isInCheck
+]
+
 { #category : 'rendering' }
 MyPiece >> leftFile [
 
@@ -158,7 +171,9 @@ MyPiece >> leftFileLegal: aBoolean [
 { #category : 'path commands' }
 MyPiece >> legalTargetSquares [
 
-	^ self targetSquaresLegal: true
+	^ (self targetSquaresLegal: true) select: [ :target |
+		(target hasPiece and: [ target contents isKing ]) not and: [
+			(self leavesKingInCheckAt: target) not ] ]
 ]
 
 { #category : 'path commands' }
