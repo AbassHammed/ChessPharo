@@ -5,6 +5,12 @@ Class {
 	#package : 'Myg-Chess-Core'
 }
 
+{ #category : 'visiting' }
+MyQueen >> acceptVisitor: aVisitor [
+
+	^ aVisitor visitQueen: self
+]
+
 { #category : 'rendering' }
 MyQueen >> renderPieceOn: aSquare [
 

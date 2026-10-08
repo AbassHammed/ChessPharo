@@ -25,6 +25,12 @@ MyPiece class >> white [
 		  yourself
 ]
 
+{ #category : 'visiting' }
+MyPiece >> acceptVisitor: aVisitor [
+
+	self subclassResponsibility
+]
+
 { #category : 'as yet unclassified' }
 MyPiece >> attackingSquares [
 	"Attacks use movement rules without recursively checking king safety."

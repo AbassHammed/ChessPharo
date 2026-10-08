@@ -5,6 +5,12 @@ Class {
 	#package : 'Myg-Chess-Core'
 }
 
+{ #category : 'visiting' }
+MyBishop >> acceptVisitor: aVisitor [
+
+	^ aVisitor visitBishop: self
+]
+
 { #category : 'accessing' }
 MyBishop >> id [
 	

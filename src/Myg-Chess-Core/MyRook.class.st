@@ -5,6 +5,12 @@ Class {
 	#package : 'Myg-Chess-Core'
 }
 
+{ #category : 'visiting' }
+MyRook >> acceptVisitor: aVisitor [
+
+	^ aVisitor visitRook: self
+]
+
 { #category : 'accessing' }
 MyRook >> id [
 	^ 'R'

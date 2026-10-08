@@ -5,6 +5,12 @@ Class {
 	#package : 'Myg-Chess-Core'
 }
 
+{ #category : 'visiting' }
+MyKing >> acceptVisitor: aVisitor [
+
+	^ aVisitor visitKing: self
+]
+
 { #category : 'as yet unclassified' }
 MyKing >> attackingSquares [
 

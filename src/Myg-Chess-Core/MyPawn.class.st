@@ -5,6 +5,12 @@ Class {
 	#package : 'Myg-Chess-Core'
 }
 
+{ #category : 'visiting' }
+MyPawn >> acceptVisitor: aVisitor [
+
+	^ aVisitor visitPawn: self
+]
+
 { #category : 'path commands' }
 MyPawn >> attackingSquares [
 
