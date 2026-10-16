@@ -34,13 +34,23 @@ MyFENGame >> castlingAbility: aCollection [
 ]
 
 { #category : 'accessing' }
+MyFENGame >> enPassantTargetSquare [
+
+	^ enPassantTargetSquare = 'NO ENPASSANT'
+		ifTrue: [ enPassantTargetSquare ]
+		ifFalse: [ String withAll: enPassantTargetSquare ]
+]
+
+{ #category : 'accessing' }
 MyFENGame >> enPassantTargetSquare: aString [ 
 	enPassantTargetSquare := aString
+
 ]
 
 { #category : 'accessing' }
 MyFENGame >> halfMoveClock: anInteger [ 
 	halfMoveClock := anInteger
+
 ]
 
 { #category : 'accessing' }
@@ -51,6 +61,7 @@ MyFENGame >> moveCount [
 { #category : 'accessing' }
 MyFENGame >> moveCount: anInteger [ 
 	moveCount := anInteger
+
 ]
 
 { #category : 'accessing' }
@@ -70,4 +81,5 @@ MyFENGame >> sideToMove [
 { #category : 'accessing' }
 MyFENGame >> sideToMove: aString [ 
 	sideToMove := aString
+
 ]

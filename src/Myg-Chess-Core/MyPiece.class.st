@@ -44,6 +44,12 @@ MyPiece >> board [
 	^ square board
 ]
 
+{ #category : 'path commands' }
+MyPiece >> capturedSquareAt: aSquare [
+
+	^ aSquare
+]
+
 { #category : 'rendering' }
 MyPiece >> collectSquares: aBlock [
 
@@ -126,6 +132,12 @@ MyPiece >> downRightDiagonalLegal: aBoolean [
 		  legal: aBoolean
 ]
 
+{ #category : 'path commands' }
+MyPiece >> enPassantTargetAfterMovingFrom: source to: destination [
+
+	^ nil
+]
+
 { #category : 'accessing' }
 MyPiece >> id [
 
@@ -135,6 +147,12 @@ MyPiece >> id [
 { #category : 'testing' }
 MyPiece >> isKing [
 	
+	^ false
+]
+
+{ #category : 'testing' }
+MyPiece >> isPawn [
+
 	^ false
 ]
 
@@ -185,10 +203,16 @@ MyPiece >> legalTargetSquares [
 { #category : 'path commands' }
 MyPiece >> moveTo: aSquare [
 
+	| oldSquare capturedSquare nextTarget |
 	(self legalTargetSquares includes: aSquare) ifFalse: [ ^ false ].
-	square emptyContents.
+	oldSquare := square.
+	capturedSquare := self capturedSquareAt: aSquare.
+	nextTarget := self enPassantTargetAfterMovingFrom: oldSquare to: aSquare.
+	capturedSquare emptyContents.
+	oldSquare emptyContents.
 	square := aSquare.
 	aSquare contents: self.
+	self board enPassantTargetSquare: nextTarget.
 	^ true
 ]
 
@@ -219,6 +243,7 @@ MyPiece >> square [
 MyPiece >> square: aMyChessSquare [ 
 	
 	square := aMyChessSquare
+
 ]
 
 { #category : 'rendering' }

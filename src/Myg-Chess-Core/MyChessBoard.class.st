@@ -8,7 +8,8 @@ Class {
 		'state',
 		'whiteColor',
 		'blackColor',
-		'game'
+		'game',
+		'enPassantTargetSquare'
 	],
 	#category : 'Myg-Chess-Core',
 	#package : 'Myg-Chess-Core'
@@ -71,21 +72,34 @@ MyChessBoard >> blackColor: anObject [
 MyChessBoard >> click: aMyChessSquare [ 
 	
 	state := state clickOn: aMyChessSquare
+
 ]
 
 { #category : 'testing' }
 MyChessBoard >> copyAfterMoving: aPiece to: aSquare [
-	"Try a move on separate squares and pieces, leaving the real board unchanged."
 
-	| copiedBoard movingPiece |
+	| copiedBoard movingPiece capturedSquare |
 	copiedBoard := self class empty.
 	self pieces do: [ :each |
 		copiedBoard at: each square name put: each copy ].
-
+	capturedSquare := aPiece capturedSquareAt: aSquare.
+	(copiedBoard at: capturedSquare name) emptyContents.
 	movingPiece := (copiedBoard at: aPiece square name) contents.
 	movingPiece square emptyContents.
 	copiedBoard at: aSquare name put: movingPiece.
 	^ copiedBoard
+]
+
+{ #category : 'accessing' }
+MyChessBoard >> enPassantTargetSquare [
+
+	^ enPassantTargetSquare
+]
+
+{ #category : 'accessing' }
+MyChessBoard >> enPassantTargetSquare: aSquare [
+
+	enPassantTargetSquare := aSquare
 ]
 
 { #category : 'accessing' }
@@ -250,12 +264,14 @@ MyChessBoard >> pieces [
 MyChessBoard >> select: aSquare [ 
 	
 	state select: aSquare
+
 ]
 
 { #category : 'accessing' }
 MyChessBoard >> selected: aMyChessSquare [ 
 	
 	selected := aMyChessSquare
+
 ]
 
 { #category : 'highlighting' }

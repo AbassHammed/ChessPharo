@@ -99,6 +99,103 @@ MyPawnTests >> testDiagonalCaptureMovesPawnAndReplacesEnemy [
 ]
 
 { #category : 'tests' }
+MyPawnTests >> testEnPassantCannotExposeOwnKing [
+
+	| game board pawn victim before |
+	game := MyChessGame fromFENString: '7k/8/8/r4pPK/8/8/8/8 w - f6 0 1'.
+	board := game pieces first board.
+	pawn := (board at: 'g5') contents.
+	victim := (board at: 'f5') contents.
+	before := board pieces copy.
+	self assertTargetsOf: pawn equal: #('g6').
+	self deny: (game move: pawn to: (board at: 'f6')).
+	self assert: board pieces equals: before.
+	self assert: (board at: 'g5') contents identicalTo: pawn.
+	self assert: (board at: 'f5') contents identicalTo: victim.
+	self deny: (board at: 'f6') hasPiece.
+	self assert: game moveHistory isEmpty.
+	self assert: game currentPlayer isWhite.
+	self assert: board enPassantTargetSquare identicalTo: (board at: 'f6')
+]
+
+{ #category : 'tests' }
+MyPawnTests >> testEnPassantCaptureForBothColorsAfterDoubleAdvance [
+
+	{
+		#('7k/3p4/8/4P3/8/8/8/K7 b - - 0 1' 'd7' 'd5' 'e5' 'd6' 'e6' ' Pd5' '2. Pd6').
+		#('7k/8/8/8/4p3/8/3P4/K7 w - - 0 1' 'd2' 'd4' 'e4' 'd3' 'e3' '1. Pd4' ' Pd3')
+	} do: [ :example |
+		| game board capturingPawn capturedPawn |
+		game := MyChessGame fromFENString: example first.
+		board := game pieces first board.
+		capturingPawn := (board at: (example at: 4)) contents.
+		capturedPawn := (board at: (example at: 2)) contents.
+		self assert: (game move: capturedPawn to: (board at: (example at: 3))).
+		self assertTargetsOf: capturingPawn equal: { example at: 5. example at: 6 }.
+		(board at: (example at: 4)) click.
+		self assert: ((board children select: #isTargetHighlighted) collect: #name) asSortedCollection asArray
+			equals: { example at: 5. example at: 6 } asSortedCollection asArray.
+		(board at: (example at: 5)) click.
+		self assert: (board at: (example at: 5)) contents identicalTo: capturingPawn.
+		self deny: (board at: (example at: 3)) hasPiece.
+		self deny: (board at: (example at: 4)) hasPiece.
+		self deny: (board pieces includes: capturedPawn).
+		self assert: board enPassantTargetSquare isNil.
+		self assert: (board children select: #isTargetHighlighted) isEmpty.
+		self assert: game currentPlayer isWhite equals: capturedPawn isWhite.
+		self assert: game moveHistory equals: { example at: 7. example at: 8 } asOrderedCollection ]
+]
+
+{ #category : 'tests' }
+MyPawnTests >> testEnPassantFromFENRequiresAnAdjacentEnemyPawn [
+
+	{
+		#('7k/8/8/3pP3/8/8/8/K7 w - d6 0 1' 'e5' 'd6' 'd5' 'e6').
+		#('7k/8/8/8/3Pp3/8/8/K7 b - d3 0 1' 'e4' 'd3' 'd4' 'e3')
+	} do: [ :example |
+		| game board pawn |
+		game := MyChessGame fromFENString: example first.
+		board := game pieces first board.
+		pawn := (board at: (example at: 2)) contents.
+		self assertTargetsOf: pawn equal: { example at: 3. example at: 5 }.
+		self assert: (game move: pawn to: (board at: (example at: 3))).
+		self deny: (board at: (example at: 4)) hasPiece.
+		self assert: (board at: (example at: 3)) contents identicalTo: pawn ].
+	#('7k/8/8/4P3/8/8/8/K7 w - d6 0 1'
+	  '7k/8/8/3PP3/8/8/8/K7 w - d6 0 1'
+	  '7k/8/8/3rP3/8/8/8/K7 w - d6 0 1') do: [ :fen |
+		| game board pawn |
+		game := MyChessGame fromFENString: fen.
+		board := game pieces first board.
+		pawn := (board at: 'e5') contents.
+		self assertTargetsOf: pawn equal: #('e6').
+		self deny: (game move: pawn to: (board at: 'd6')).
+		self assert: game moveHistory isEmpty ]
+]
+
+{ #category : 'tests' }
+MyPawnTests >> testEnPassantOpportunitySurvivesRejectionButExpiresAfterAnotherMove [
+
+	| game board pawn |
+	game := MyChessGame fromFENString: '7k/3p4/8/4P3/8/8/8/K7 b - - 0 1'.
+	board := game pieces first board.
+	pawn := (board at: 'e5') contents.
+	self assert: (game move: (board at: 'd7') contents to: (board at: 'd5')).
+	self deny: (game move: pawn to: (board at: 'e7')).
+	self assertTargetsOf: pawn equal: #('d6' 'e6').
+	self assert: game currentPlayer isWhite.
+	self assert: game moveHistory equals: #(' Pd5') asOrderedCollection.
+	self assert: (game move: (board at: 'a1') contents to: (board at: 'a2')).
+	self assert: board enPassantTargetSquare isNil.
+	self assert: (game move: (board at: 'h8') contents to: (board at: 'h7')).
+	self assertTargetsOf: pawn equal: #('e6').
+	self deny: (game move: pawn to: (board at: 'd6')).
+	self assert: (board at: 'e5') contents identicalTo: pawn.
+	self assert: (board at: 'd5') hasPiece.
+	self assert: game moveHistory equals: #(' Pd5' '2. Ka2' ' Kh7') asOrderedCollection
+]
+
+{ #category : 'tests' }
 MyPawnTests >> testForwardBlockPreventsMovingOrCapturing [
 	{ Color white. Color black } do: [ :obstacleColor |
 	 | board white black first second |

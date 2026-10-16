@@ -118,6 +118,8 @@ MyChessGame >> initializeFromFENGame: aFENGame [
 
 	board := MyChessBoard fromFENBoard: aFENGame board.
 	board game: self.
+	aFENGame enPassantTargetSquare = 'NO ENPASSANT' ifFalse: [
+		board enPassantTargetSquare: (board at: aFENGame enPassantTargetSquare asString) ].
 	button := ToButton new.
 	button labelText: 'Play!'.
 	button whenClickedDo: [ self play ].

@@ -21,6 +21,35 @@ MyPawn >> attackingSquares [
 	^ { forward left. forward right } select: [ :each | each notNil ]
 ]
 
+{ #category : 'testing' }
+MyPawn >> canCaptureEnPassantAt: aSquare [
+
+	| capturedSquare |
+	aSquare == self board enPassantTargetSquare ifFalse: [ ^ false ].
+	aSquare hasPiece ifTrue: [ ^ false ].
+	square file = (self isWhite ifTrue: [ $5 ] ifFalse: [ $4 ]) ifFalse: [ ^ false ].
+	(self attackingSquares includes: aSquare) ifFalse: [ ^ false ].
+	capturedSquare := self isWhite ifTrue: [ aSquare down ] ifFalse: [ aSquare up ].
+	^ capturedSquare hasPiece and: [
+		capturedSquare contents isPawn and: [ capturedSquare contents color ~= color ] ]
+]
+
+{ #category : 'path commands' }
+MyPawn >> capturedSquareAt: aSquare [
+
+	(self canCaptureEnPassantAt: aSquare) ifTrue: [
+		^ self isWhite ifTrue: [ aSquare down ] ifFalse: [ aSquare up ] ].
+	^ super capturedSquareAt: aSquare
+]
+
+{ #category : 'path commands' }
+MyPawn >> enPassantTargetAfterMovingFrom: source to: destination [
+
+	(source file asciiValue - destination file asciiValue) abs = 2 ifTrue: [
+		^ self isWhite ifTrue: [ source up ] ifFalse: [ source down ] ].
+	^ nil
+]
+
 { #category : 'path commands' }
 MyPawn >> forwardSquare [
 
@@ -50,6 +79,12 @@ MyPawn >> isOnStartingRank [
 	^ self isWhite
 		ifTrue: [ square file = $2 ]
 		ifFalse: [ square file = $7 ]
+]
+
+{ #category : 'testing' }
+MyPawn >> isPawn [
+
+	^ true
 ]
 
 { #category : 'path commands' }
@@ -87,6 +122,7 @@ MyPawn >> promoteTo: aPieceClass [
 MyPawn >> renderPieceOn: aSquare [ 
 	
 	^ aSquare renderPawn: self
+
 ]
 
 { #category : 'path commands' }
@@ -107,7 +143,8 @@ MyPawn >> targetSquaresLegal: aBoolean [
 				targets add: second ] ] ].
 
 	self attackingSquares do: [ :each |
-		(each hasPiece and: [ each contents color ~= color ]) ifTrue: [
+		((each hasPiece and: [ each contents color ~= color ]) or: [
+			self canCaptureEnPassantAt: each ]) ifTrue: [
 			targets add: each ] ].
 
 	^ targets
