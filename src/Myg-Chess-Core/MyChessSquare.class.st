@@ -42,7 +42,7 @@ MyChessSquare >> + aPoint [
 	column := (self column asciiValue + aPoint x) asCharacter asString.
 	file := (self file asciiValue + aPoint y) asCharacter asString.
 
-	^ board at: column , file ifAbsent: [ ^ nil ]
+	^ board at: column , file
 ]
 
 { #category : 'accessing' }
@@ -54,6 +54,7 @@ MyChessSquare >> board [
 MyChessSquare >> board: aMyChessBoard [ 
 	
 	board := aMyChessBoard
+
 ]
 
 { #category : 'initialization' }
@@ -161,6 +162,12 @@ MyChessSquare >> initialize [
 		geometry: BlSquareGeometry new.
 
 	self addEventHandlerOn: BlClickEvent do: [ :e | self click ]
+]
+
+{ #category : 'testing' }
+MyChessSquare >> isOnBoard [
+
+	^ true
 ]
 
 { #category : 'testing' }

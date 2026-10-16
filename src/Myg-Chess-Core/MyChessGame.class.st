@@ -157,6 +157,7 @@ MyChessGame >> move: piece to: square [
 MyChessGame >> move: piece to: square promotingTo: aPieceClass [
 
 	| promoting moved |
+	square isOnBoard ifFalse: [ ^ false ].
 	piece color = currentPlayer color ifFalse: [ ^ false ].
 	promoting := piece needsPromotionAt: square.
 	moved := promoting
@@ -187,6 +188,7 @@ MyChessGame >> moveHistory [
 MyChessGame >> moveInteractively: piece to: square [
 
 	| choice |
+	square isOnBoard ifFalse: [ ^ false ].
 	piece color = currentPlayer color ifFalse: [ ^ false ].
 	(piece legalTargetSquares includes: square) ifFalse: [ ^ false ].
 	(piece needsPromotionAt: square) ifFalse: [ ^ self move: piece to: square ].

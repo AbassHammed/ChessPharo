@@ -14,11 +14,7 @@ MyPawn >> acceptVisitor: aVisitor [
 { #category : 'path commands' }
 MyPawn >> attackingSquares [
 
-	| forward |
-	forward := self forwardSquare.
-	forward ifNil: [ ^ #() ].
-
-	^ { forward left. forward right } select: [ :each | each notNil ]
+	^ { self forwardSquare left. self forwardSquare right } select: #isOnBoard
 ]
 
 { #category : 'testing' }
@@ -133,13 +129,13 @@ MyPawn >> targetSquaresLegal: aBoolean [
 	targets := OrderedCollection new.
 	forward := self forwardSquare.
 
-	(forward notNil and: [ forward hasPiece not ]) ifTrue: [
+	(forward isOnBoard and: [ forward hasPiece not ]) ifTrue: [
 		targets add: forward.
 		self isOnStartingRank ifTrue: [
 			second := self isWhite
 				ifTrue: [ forward up ]
 				ifFalse: [ forward down ].
-			(second notNil and: [ second hasPiece not ]) ifTrue: [
+			(second isOnBoard and: [ second hasPiece not ]) ifTrue: [
 				targets add: second ] ] ].
 
 	self attackingSquares do: [ :each |
