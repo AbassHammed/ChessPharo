@@ -13,6 +13,7 @@ Class {
 MyMoveFeedbackTest >> highlightedSquareNames [
 
 	^ (board children select: #isTargetHighlighted) collect: #name
+
 ]
 
 { #category : 'running' }
@@ -21,6 +22,7 @@ MyMoveFeedbackTest >> setUp [
 	super setUp.
 	game := MyChessGame freshGame.
 	board := game pieces first board
+
 ]
 
 { #category : 'tests - support' }
@@ -31,6 +33,7 @@ MyMoveFeedbackTest >> setUpPinnedRook [
 	board at: 'e2' put: MyRook white.
 	board at: 'e8' put: MyRook black.
 	board at: 'a8' put: MyKing black
+
 ]
 
 { #category : 'tests' }
@@ -47,6 +50,7 @@ MyMoveFeedbackTest >> testAcceptedClickClearsHighlightsAndRecordsOnce [
 	self deny: (board at: 'e2') hasPiece.
 	self deny: game currentPlayer isWhite.
 	self assert: game moveCount equals: 1
+
 ]
 
 { #category : 'tests' }
@@ -85,6 +89,7 @@ MyMoveFeedbackTest >> testAcceptedMovesAlternatePlayersAndCountCompletedRounds [
 	self deny: game currentPlayer isWhite.
 	self assert: game moveCount equals: 2.
 	self assert: game moveHistory equals: #('1. Pe4' ' Pe5' '2. Nf3') asOrderedCollection
+
 ]
 
 { #category : 'tests' }
@@ -98,6 +103,35 @@ MyMoveFeedbackTest >> testBotButtonPassesTurnOnlyOnce [
 	self assert: game currentPlayer isWhite.
 	self assert: game moveCount equals: 2.
 	self assert: game moveHistory size equals: 2
+
+]
+
+{ #category : 'tests' }
+MyMoveFeedbackTest >> testEndingSelectionClearsHighlightsAfterPlayMovesThePiece [
+
+	| pawn blackPawn |
+	pawn := (board at: 'e2') contents.
+	blackPawn := (board at: 'e7') contents.
+	game currentPlayer strategy: (MyFixedMoveStrategy new
+		move: (MyMoveCommand piece: pawn to: (board at: 'e4'));
+		yourself).
+	(board at: 'e2') click.
+	self assert: self highlightedSquareNames asSortedCollection asArray equals: #('e3' 'e4').
+	game play.
+	self assert: (board at: 'e4') contents identicalTo: pawn.
+	self deny: (board at: 'e2') hasPiece.
+	(board at: 'd3') click.
+	self assert: self highlightedSquareNames isEmpty.
+	self assert: game moveHistory equals: #('1. Pe4') asOrderedCollection.
+	self deny: game currentPlayer isWhite.
+	(board at: 'e7') click.
+	self assert: self highlightedSquareNames asSortedCollection asArray equals: #('e5' 'e6').
+	(board at: 'e5') click.
+	self assert: self highlightedSquareNames isEmpty.
+	self deny: (board at: 'e7') hasPiece.
+	self assert: (board at: 'e5') contents identicalTo: blackPawn.
+	self assert: game currentPlayer isWhite.
+	self assert: game moveHistory equals: #('1. Pe4' ' Pe5') asOrderedCollection
 ]
 
 { #category : 'tests' }
@@ -112,6 +146,7 @@ MyMoveFeedbackTest >> testKingCaptureIsRecordedOnce [
 	self assert: game moveHistory equals: #('1. Kd2') asOrderedCollection.
 	self assert: (board at: 'd2') contents identicalTo: king.
 	self deny: (board at: 'e1') hasPiece
+
 ]
 
 { #category : 'tests' }
@@ -128,6 +163,7 @@ MyMoveFeedbackTest >> testRejectedClickClearsHighlightsWithoutRecordingMove [
 	self deny: (board at: 'd2') hasPiece.
 	self assert: game currentPlayer isWhite.
 	self assert: game moveCount equals: 1
+
 ]
 
 { #category : 'tests' }
@@ -149,6 +185,7 @@ MyMoveFeedbackTest >> testRejectedMovePreservesExistingHistory [
 	self assert: game moveCount equals: 1.
 	self assert: (board at: 'e7') contents identicalTo: blackPawn.
 	self assert: (board at: 'e4') contents identicalTo: whitePawn
+
 ]
 
 { #category : 'tests' }
@@ -159,4 +196,5 @@ MyMoveFeedbackTest >> testSelectingPinnedRookHighlightsOnlyLegalMoves [
 	self
 		assert: self highlightedSquareNames asSortedCollection asArray
 		equals: #('e3' 'e4' 'e5' 'e6' 'e7' 'e8') asSortedCollection asArray
+
 ]

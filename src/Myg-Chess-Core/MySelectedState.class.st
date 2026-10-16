@@ -3,18 +3,20 @@ Class {
 	#superclass : 'Object',
 	#instVars : [
 		'board',
-		'selection'
+		'selection',
+		'highlightedSquares'
 	],
 	#category : 'Myg-Chess-Core',
 	#package : 'Myg-Chess-Core'
 }
 
 { #category : 'instance creation' }
-MySelectedState class >> board: aBoard selected: aMyChessSquare [
+MySelectedState class >> board: aBoard selected: aMyChessSquare targets: squares [
 
 	^ self new
 		  board: aBoard;
 		  selection: aMyChessSquare;
+		  highlightedSquares: squares;
 		  yourself
 ]
 
@@ -34,10 +36,16 @@ MySelectedState >> board: anObject [
 MySelectedState >> clickOn: aMyChessSquare [
 
 	selection unselect.
+	board unhighLightTargets: highlightedSquares.
 	selection hasPiece ifTrue: [
-		board unhighLightTargets: selection contents legalTargetSquares.
 		board game moveInteractively: selection contents to: aMyChessSquare ].
 	^ MyUnselectedState board: board
+]
+
+{ #category : 'accessing' }
+MySelectedState >> highlightedSquares: squares [
+
+	highlightedSquares := squares
 ]
 
 { #category : 'accessing' }
